@@ -1,5 +1,7 @@
 library(RUnit)
 #----------------------------------------------------------------------------------------------------
+printf <- function(...) print(noquote(sprintf(...)))
+#----------------------------------------------------------------------------------------------------
 runTests <- function()
 {
    test_readData();
@@ -7,9 +9,12 @@ runTests <- function()
 
 } # runTests
 #----------------------------------------------------------------------------------------------------
-readData <- function(filename="heights.tsv")
+readData <- function(filename="heights.tsv", quiet=TRUE)
 {
    stopifnot(file.exists(filename))
+   if(!quiet)
+      printf("we are about to read '%s'", filename)
+
    tbl <- read.table(filename, sep="\t", header=TRUE)
 
    return(tbl)
@@ -23,7 +28,7 @@ calculateRelationships <- function(tbl, independentVariableName, dependentVariab
 
    vec1 <- tbl[, independentVariableName]
    vec2 <- tbl[, dependentVariableName]
-   # browser()
+   #browser()
    return(list(correlation=cor(vec1, vec2),
                covariance=cov(vec1, vec2)))
 
@@ -32,6 +37,9 @@ calculateRelationships <- function(tbl, independentVariableName, dependentVariab
 test_calculateRelationships <- function()
 {
    print("--- test_calculateRelationships")
+
+   tbl <- readData()
+
    result <- calculateRelationships(tbl, "twoYears", "adult")
    checkTrue(result$correlation > 0.9)
    checkTrue(result$covariance > 9.0)
